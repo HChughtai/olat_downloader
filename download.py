@@ -2,6 +2,8 @@ import click
 import os
 import pdfx
 import re
+import requests
+from bs4 import BeautifulSoup
 
 @click.command()
 @click.argument('report', type=click.Path(exists=True))
@@ -16,6 +18,11 @@ def download(report):
     filtered_data = filter(check_file_url, merged_data)
 
     #import pdb; pdb.set_trace()
+
+def create_olat_session(olat_username, olat_password):
+
+def get_olat_file(olat_session, url_path):
+
 
 def check_file_url(url_path):
     
