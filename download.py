@@ -6,9 +6,16 @@ import requests
 from bs4 import BeautifulSoup
 
 @click.command()
-@click.argument('report', type=click.Path(exists=True))
-def download(report):
-    
+@click.option('--report', prompt=True,type=click.Path(exists=True))
+@click.option('--username', prompt=True)
+@click.option('--password', prompt=True, hide_input=True,
+              confirmation_prompt=True)
+
+
+def download(report,username,password):
+
+    click.echo("Reading report from %s" % report)
+
     # extract links from pdf
     pdf = pdfx.PDFx(report)
     references_dict = pdf.get_references_as_dict()
@@ -17,9 +24,20 @@ def download(report):
     merged_data = [j for i in data for j in i]
     filtered_data = filter(check_file_url, merged_data)
 
-    import pdb; pdb.set_trace()
+    if not os.path.exists('downloads'):
+        os.makedirs('downloads')
+    
+    session = create_olat_session(username, password)
+    click.echo("Logged into OLAT as %s" % username)
 
-    return 1
+    for url in filtered_data:
+        file_name = url.rsplit('/', 1)[1]
+
+        if os.path.isfile('downloads/'+file_name) == True:
+            click.echo("Skipping %s - file exists on disk" % url)
+        else:
+            get_olat_file(session,url,file_name)
+
 
 def create_olat_session(olat_username, olat_password):
 
@@ -31,8 +49,17 @@ def create_olat_session(olat_username, olat_password):
     return session
 
 
-def get_olat_file(olat_session, url_path):
-    pass
+def get_olat_file(session, url,file_name):
+    
+    try:
+        r = session.get(url, allow_redirects=True)
+        click.echo("Downloading %s" % url)
+        open('downloads/'+file_name, 'wb').write(r.content)
+
+    except requests.exceptions.RequestException:
+        click.echo("Skipping %s - not an accessible url" % url)
+
+        
 
 
 def check_file_url(url_path):
