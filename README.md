@@ -18,9 +18,10 @@ $ pip install -r requirements.txt
 ## Usage
 
 The script acts on a generated and downloaded OLAT summary report by:
-    1. Extracting all file urls
-    2. Logging into OLAT with the provided details
-    3. Downloading all files into a `Downloads` folder in the script's root directory
+
+1. Extracting all file urls
+2. Logging into OLAT with the provided details
+3. Downloading all files into a `Downloads` folder in the script's root directory
 
 ```
 $ python download.py # running without options will make the script prompt for input
