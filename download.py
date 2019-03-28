@@ -6,10 +6,10 @@ import requests
 from bs4 import BeautifulSoup
 
 @click.command()
-@click.option('--report', prompt=True,type=click.Path(exists=True))
-@click.option('--username', prompt=True)
+@click.option('--report', prompt=True,type=click.Path(exists=True),help='the downloaded OLAT report')
+@click.option('--username', prompt=True,help='the email address used to login to OLAT')
 @click.option('--password', prompt=True, hide_input=True,
-              confirmation_prompt=True)
+              confirmation_prompt=True,help='the OLAT password')
 
 
 def download(report,username,password):
