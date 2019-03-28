@@ -17,11 +17,22 @@ def download(report):
     merged_data = [j for i in data for j in i]
     filtered_data = filter(check_file_url, merged_data)
 
-    #import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
+
+    return 1
 
 def create_olat_session(olat_username, olat_password):
 
+    form_data = {'name': olat_username, 'pass': olat_password,"form_build_id": "form-aJoz9y0op4X9SURCNSrc_wZaVYM4_2lkzhCPMyMy7r4", "form_id":"user_login", "op":"Log+in"} 
+    login_url = "https://olat.nshcs.org.uk/user/login"
+    session = requests.Session()
+    session.post(login_url, data=form_data)
+    
+    return session
+
+
 def get_olat_file(olat_session, url_path):
+    pass
 
 
 def check_file_url(url_path):
