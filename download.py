@@ -3,16 +3,23 @@ import os
 import pdfx
 import re
 import requests
-from bs4 import BeautifulSoup
+import tkinter as tk
+from tkinter import filedialog
 
 @click.command()
-@click.option('--report', prompt=True,type=click.Path(exists=True),help='the downloaded OLAT report')
+@click.option('--report', prompt=False,type=click.Path(exists=True),help='the downloaded OLAT report')
 @click.option('--username', prompt=True,help='the email address used to login to OLAT')
 @click.option('--password', prompt=True, hide_input=True,
               confirmation_prompt=True,help='the OLAT password')
 
 
 def download(report,username,password):
+
+    if report is None:
+        root = tk.Tk()
+        root.withdraw()
+
+        report = filedialog.askopenfilename()
 
     click.echo("Reading report from %s" % report)
 
@@ -30,10 +37,12 @@ def download(report,username,password):
     session = create_olat_session(username, password)
     click.echo("Logged into OLAT as %s" % username)
 
+    output_folder = filedialog.askdirectory()
+
     for url in filtered_data:
         file_name = url.rsplit('/', 1)[1]
 
-        if os.path.isfile('downloads/'+file_name) == True:
+        if os.path.isfile(output_folder+'/'+file_name) == True:
             click.echo("Skipping %s - file exists on disk" % url)
         else:
             get_olat_file(session,url,file_name)
