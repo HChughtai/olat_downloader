@@ -15,7 +15,11 @@ from tkinter import filedialog
 
 def download(report,username,password):
 
+    session = create_olat_session(username, password)
+
     if report is None:
+        click.echo("Please select exported report pdf")
+
         root = tk.Tk()
         root.withdraw()
 
@@ -33,16 +37,11 @@ def download(report,username,password):
 
     if not os.path.exists('downloads'):
         os.makedirs('downloads')
-    
-    session = create_olat_session(username, password)
-    click.echo("Logged into OLAT as %s" % username)
-
-    output_folder = filedialog.askdirectory()
 
     for url in filtered_data:
         file_name = url.rsplit('/', 1)[1]
 
-        if os.path.isfile(output_folder+'/'+file_name) == True:
+        if os.path.isfile('downloads'+'/'+file_name) == True:
             click.echo("Skipping %s - file exists on disk" % url)
         else:
             get_olat_file(session,url,file_name)
@@ -53,9 +52,14 @@ def create_olat_session(olat_username, olat_password):
     form_data = {'name': olat_username, 'pass': olat_password,"form_build_id": "form-aJoz9y0op4X9SURCNSrc_wZaVYM4_2lkzhCPMyMy7r4", "form_id":"user_login", "op":"Log+in"} 
     login_url = "https://olat.nshcs.org.uk/user/login"
     session = requests.Session()
-    session.post(login_url, data=form_data)
-    
-    return session
+    r = session.post(login_url, data=form_data, allow_redirects=True)
+
+    if r.url == "https://olat.nshcs.org.uk/home":
+        click.echo("Logged into OLAT as %s" % olat_username)
+        return session
+    else:
+        click.echo("Login Failed - Exiting")
+        exit()
 
 
 def get_olat_file(session, url,file_name):
